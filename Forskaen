@@ -10,17 +10,6 @@ local Window = WindUI:CreateWindow({
     SideBarWidth = 200,
 Background = "rbxassetid://135153457615455",
     HasOutline = false,
-    KeySystem = { 
-        Key = { "TwoTimes", "007n7" },
-        Note = "The Key is 'TwoTimes' or '007n7'",
-        Thumbnail = {
-            Image = "rbxassetid://103783324545165",
-            Title = "TwoForsaken"
-        },
-        URL = "NO URL",
-        SaveKey = false,
-    },
-})
 
 Window:EditOpenButton({
     Title = "! The Forsaken Bin | Forsaken Hub !",
