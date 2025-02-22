@@ -1,0 +1,840 @@
+local WindUI = loadstring(game:HttpGet("https://tree-hub.vercel.app/api/UI/WindUI"))()
+local Window = WindUI:CreateWindow({
+    Title = "The Forsaken Memoirs",
+    Icon = "rbxassetid://80047686698954",
+    Author = "Two Time",
+    Folder = "Dussaker",
+    Size = UDim2.fromOffset(380, 260),
+    Transparent = true,
+    Theme = "Dark",
+    SideBarWidth = 200,
+Background = "rbxassetid://135153457615455",
+    HasOutline = false,
+    KeySystem = { 
+        Key = { "TwoTimes", "007n7" },
+        Note = "The Key is 'TwoTimes' or '007n7'",
+        Thumbnail = {
+            Image = "rbxassetid://103783324545165",
+            Title = "TwoForsaken"
+        },
+        URL = "NO URL",
+        SaveKey = false,
+    },
+})
+
+Window:EditOpenButton({
+    Title = "! The Forsaken Bin | Forsaken Hub !",
+    Icon = "rbxassetid://103783324545165",
+    CornerRadius = UDim.new(0,10),
+    StrokeThickness = 2,
+    Color = ColorSequence.new(
+        Color3.fromHex("393939"), 
+        Color3.fromHex("4d443f")
+    )
+})
+local executorname = 
+    (pcall(function() return getexecutorname() end) and getexecutorname()) or 
+    (pcall(function() return identifyexecutor() end) and identifyexecutor()) or 
+    "Unknown"
+
+WindUI:Notify({
+    Title = "Executor Detected",
+    Content = "Executor: " .. executorname,
+    Duration = 5,
+})
+local username = game.Players.LocalPlayer.Name
+
+WindUI:Notify({
+    Title = "Execution User",
+    Content = "Executed by: " .. username,
+    Duration = 5,
+})
+WindUI:Notify({
+    Title = "Script Status",
+    Content = "The script has loaded successfully!",
+    Duration = 5,
+})
+local player = game.Players.LocalPlayer
+local ping = math.floor(game:GetService("Stats").Network.ServerStatsItem["Data Ping"]:GetValue()) 
+
+WindUI:Notify({
+    Title = "Player Ping",
+    Content = "Ping: " .. ping .. " ms",
+    Duration = 5,
+})
+WindUI:AddTheme({
+    Name = "Dark Abyss",
+
+    Background = "#160c25",
+    Accent = "#140c21",
+    Outline = "#1b1328",
+
+    Text = "#EAEAEA",
+    PlaceholderText = "#AAAAAA",
+    
+    Primary = "#1b1328",
+    Secondary = "#140c21",
+    Success = "#160c25",
+    Warning = "#332244",
+    Error = "#551144"
+})
+WindUI:SetTheme("Dark Abyss")
+local InfoTab = Window:Tab({
+    Title = "Info !",
+    Icon = "info",
+    Desc = "View important information and details."
+})
+
+Window:Divider()
+
+local GeneratorsTab = Window:Tab({
+    Title = "Generators !",
+    Icon = "badge-check",
+    Desc = "Manage and interact with in-game generators."
+})
+
+local StaminaTab = Window:Tab({
+    Title = "Stamina !",
+    Icon = "badge-plus",
+    Desc = "Monitor and manage stamina levels."
+})
+
+local AimbotTab = Window:Tab({
+    Title = "Aimbot !",
+    Icon = "badge-percent",
+    Desc = "Activate and configure aimbot features."
+})
+
+local VisualTab = Window:Tab({
+    Title = "Visual !",
+    Icon = "badge-x",
+    Desc = "Customize and tweak visual settings."
+})
+
+local EmotesTab = Window:Tab({
+    Title = "Emotes !",
+    Icon = "badge-dollar-sign",
+    Desc = "Choose and use emotes in the game."
+})
+
+Window:Divider()
+
+local DevTab = Window:Tab({
+    Title = "Dev !",
+    Icon = "badge-cent",
+    Desc = "Access developer tools and settings."
+})
+local Button = GeneratorsTab:Button({
+    Title = "Repair Generator",
+    Desc = "Repair Progress 1%",
+    Callback = function()
+task.spawn(function()
+            local gameArea = workspace:FindFirstChild("Map")
+            if not gameArea then return end
+            local gameSession = gameArea:FindFirstChild("Ingame")
+            if not gameSession then return end
+            local levelData = gameSession:FindFirstChild("Map")
+            if not levelData then return end
+
+            for _, obj in ipairs(levelData:GetChildren()) do
+                if obj:IsA("Model") and obj.Name == "Generator" then
+                    local interaction = obj:FindFirstChild("Remotes")
+                    if interaction then
+                        local remote = interaction:FindFirstChild("RE")
+                        if remote and remote:IsA("RemoteEvent") then
+                            remote:FireServer()
+                        end
+                    end
+                end
+            end
+        end)
+    end,
+})
+local Toggle = GeneratorsTab:Toggle({
+    Title = "Auto-Repair Generator Fast",
+    Desc = "Complete",
+    Value = false,
+    Callback = function(state)
+        if state then
+            task.spawn(function()
+                while state do
+                    local gameArea = workspace:FindFirstChild("Map")
+                    if not gameArea then break end
+
+                    local gameSession = gameArea:FindFirstChild("Ingame")
+                    if not gameSession then break end
+
+                    local levelData = gameSession:FindFirstChild("Map")
+                    if not levelData then break end
+
+                    for _, obj in ipairs(levelData:GetChildren()) do
+                        if obj:IsA("Model") and obj.Name == "Generator" then
+                            local interaction = obj:FindFirstChild("Remotes")
+                            if interaction then
+                                local remote = interaction:FindFirstChild("RE")
+                                if remote and remote:IsA("RemoteEvent") then
+                                    remote:FireServer()
+                                end
+                            end
+                        end
+                    end
+
+                    task.wait(0.1) 
+                end
+            end)
+        end
+    end,
+})
+local Toggle = GeneratorsTab:Toggle({
+    Title = "AutoFarm-Generators",
+    Desc = "All completes Generator",
+    Value = false,
+    Callback = function(state)
+if state then
+    local Players = game:GetService("Players")
+    local player = Players.LocalPlayer
+    local character = player.Character or player.CharacterAdded:Wait()
+    local ingameFolder = workspace:FindFirstChild("Map") and workspace.Map:FindFirstChild("Ingame")
+    local mapFolder = ingameFolder and ingameFolder:FindFirstChild("Map")
+
+    if mapFolder and character and character.PrimaryPart then
+        local generators = {}
+
+        for _, g in ipairs(mapFolder:GetChildren()) do
+            if g:IsA("Model") and g.Name == "Generator" then
+                local progress = g:FindFirstChild("Progress")
+                local remotes = g:FindFirstChild("Remotes")
+                local remoteEvent = remotes and remotes:FindFirstChild("RE")
+                local remoteRF = remotes and remotes:FindFirstChild("RF")
+
+                if progress and progress:IsA("NumberValue") and remoteEvent and remoteRF then
+                    table.insert(generators, { model = g, progress = progress, remote = remoteEvent, remoteRF = remoteRF })
+                end
+            end
+        end
+
+        if #generators > 0 then
+            while state do
+                for _, gen in ipairs(generators) do
+                    if gen.progress.Value < 100 then
+                        local genPrimaryPart = gen.model.PrimaryPart or gen.model:FindFirstChildWhichIsA("BasePart")
+                        if genPrimaryPart then
+                            local direction = genPrimaryPart.CFrame.LookVector
+                            local positionInFront = genPrimaryPart.Position + direction * 5
+                            character:SetPrimaryPartCFrame(CFrame.new(positionInFront))
+                            WindUI:Notify({
+                                Title = "Notification",
+                                Content = "Teleported to generator: " .. gen.model.Name,
+                                Duration = 5,
+                            })
+
+                            local args = {
+                                [1] = "enter"
+                            }
+                            while gen.progress.Value < 100 and state do
+                                gen.remoteRF:InvokeServer(unpack(args))
+                                gen.remote:FireServer()
+                                wait(0.5)
+                            end
+
+                            WindUI:Notify({
+                                Title = "Notification",
+                                Content = "Generator completed: " .. gen.model.Name,
+                                Duration = 5,
+                            })
+                            wait(0.5)
+                        end
+                    end
+                end
+
+                local allCompleted = true
+                for _, gen in ipairs(generators) do
+                    if gen.progress.Value < 100 then
+                        allCompleted = false
+                        break
+                    end
+                end
+
+                if allCompleted then
+                    WindUI:Notify({
+                        Title = "Notification",
+                        Content = "All generators completed.",
+                        Duration = 5,
+                    })
+                    break
+                end
+            end
+        else
+            WindUI:Notify({
+                Title = "Notification",
+                Content = "No generators found.",
+                Duration = 5,
+            })
+        end
+    else
+        WindUI:Notify({
+            Title = "Notification",
+            Content = "Map or character not found.",
+            Duration = 5,
+        })
+    end
+end
+    end,
+})
+local Button = GeneratorsTab:Button({
+    Title = "Random Generator",
+    Desc = "Teleport to a random generator",
+    Callback = function()
+        local Players = game:GetService("Players")
+        local player = Players.LocalPlayer
+        local character = player.Character or player.CharacterAdded:Wait()
+        local hrp = character:FindFirstChild("HumanoidRootPart")
+
+        local ingameFolder = workspace:FindFirstChild("Map") and workspace.Map:FindFirstChild("Ingame")
+        local mapFolder = ingameFolder and ingameFolder:FindFirstChild("Map")
+
+        if mapFolder and hrp then
+            local generators = {}
+
+            for _, g in ipairs(mapFolder:GetChildren()) do
+                if g.Name == "Generator" then
+                    table.insert(generators, g)
+                end
+            end
+
+            if #generators >= 4 and #generators <= 7 then
+                local randomGen = generators[math.random(1, #generators)]
+                hrp.CFrame = randomGen.CFrame + Vector3.new(0, 3, 0)
+                WindUI:Notify({
+                    Title = "Notification",
+                    Content = "Teleported to a random generator.",
+                    Duration = 5,
+                })
+            else
+                WindUI:Notify({
+                    Title = "Notification",
+                    Content = "Generator count is not between 4 and 7.",
+                    Duration = 5,
+                })
+            end
+        else
+            WindUI:Notify({
+                Title = "Notification",
+                Content = "Map or HumanoidRootPart not found.",
+                Duration = 5,
+            })
+        end
+    end,
+})
+local function protectGame()
+    local mt = getrawmetatable(game)
+    if not mt then return end
+
+    local oldNamecall = mt.__namecall
+    setreadonly(mt, false)
+
+    mt.__namecall = newcclosure(function(self, ...)
+        if getnamecallmethod():lower() == "kick" then
+            return nil
+        end
+        return oldNamecall(self, ...)
+    end)
+
+    setreadonly(mt, true)
+end
+
+protectGame()
+
+local replicatedStorage = game:GetService("ReplicatedStorage")
+local systems = replicatedStorage:FindFirstChild("Systems")
+local characterSystem = systems and systems:FindFirstChild("Character")
+local gameConfig = characterSystem and characterSystem:FindFirstChild("Game")
+local sprinting = gameConfig and gameConfig:FindFirstChild("Sprinting")
+local sprintSettings = sprinting and require(sprinting)
+
+local function createInput(tab, title, desc, placeholder, callback)
+    return tab:Input({
+        Title = title,
+        Desc = desc,
+        Value = "",
+        PlaceholderText = placeholder,
+        ClearTextOnFocus = true,
+        Callback = function(Text)
+            task.wait(0.5)
+            local value = tonumber(Text)
+            if value and sprintSettings then
+                callback(sprintSettings, value)
+            end
+        end
+    })
+end
+
+createInput(StaminaTab, "Set Max Stamina", "Enter a number to change Max Stamina", "Enter stamina...",
+    function(settings, value) settings.MaxStamina = value end)
+
+createInput(StaminaTab, "Set Stamina Loss", "Enter a number to change Stamina Loss", "Enter value...",
+    function(settings, value) settings.StaminaLoss = value end)
+
+createInput(StaminaTab, "Set Stamina Gain", "Enter a number to change Stamina Gain", "Enter value...",
+    function(settings, value) settings.StaminaGain = value end)
+
+createInput(StaminaTab, "Set Sprint Speed", "Enter a number to change Sprint Speed", "Enter speed...",
+    function(settings, value) settings.SprintSpeed = value end)
+
+local infiniteStaminaThread
+
+local Toggle = StaminaTab:Toggle({
+    Title = "Infinite Stamina",
+    Desc = "Disable Stamina Drain",
+    Value = false,
+    Callback = function(state)
+        getgenv().staminaEnabled = state
+
+        if state then
+            infiniteStaminaThread = task.spawn(function()
+                while getgenv().staminaEnabled do
+                    if sprintSettings then
+                        sprintSettings.StaminaLossDisabled = function() end
+                    end
+                    task.wait(math.random(0.9, 1.7))
+                end
+                if sprintSettings then
+                    sprintSettings.StaminaLossDisabled = nil
+                end
+            end)
+        else
+            if infiniteStaminaThread then
+                task.cancel(infiniteStaminaThread)
+                infiniteStaminaThread = nil
+            end
+        end
+    end,
+})
+local ToggleSurvivorsESP = VisualTab:Toggle({
+    Title = "ESP Survivors",
+    Desc = "Enable/Disable ESP for Survivors",
+    Value = false,
+    Callback = function(state)
+        if state then
+            for _, survivor in ipairs(workspace.Players.Survivors:GetChildren()) do
+                if survivor:IsA("Model") and survivor:FindFirstChild("HumanoidRootPart") then
+                    local highlight = Instance.new("Highlight")
+                    highlight.Parent = survivor
+                    highlight.FillColor = Color3.fromRGB(0, 255, 0)
+                    highlight.OutlineColor = Color3.fromRGB(0, 0, 0)
+                    highlight.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
+                end
+            end
+        else
+            for _, survivor in ipairs(workspace.Players.Survivors:GetChildren()) do
+                if survivor:FindFirstChildOfClass("Highlight") then
+                    survivor:FindFirstChildOfClass("Highlight"):Destroy()
+                end
+            end
+        end
+    end,
+})
+
+local ToggleKillersESP = VisualTab:Toggle({
+    Title = "ESP Killers",
+    Desc = "Enable/Disable ESP for Killers",
+    Value = false,
+    Callback = function(state)
+        if state then
+            for _, killer in ipairs(workspace.Players.Killers:GetChildren()) do
+                if killer:IsA("Model") and killer:FindFirstChild("HumanoidRootPart") then
+                    local highlight = Instance.new("Highlight")
+                    highlight.Parent = killer
+                    highlight.FillColor = Color3.fromRGB(255, 0, 0)
+                    highlight.OutlineColor = Color3.fromRGB(0, 0, 0)
+                    highlight.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
+                end
+            end
+        else
+            for _, killer in ipairs(workspace.Players.Killers:GetChildren()) do
+                if killer:FindFirstChildOfClass("Highlight") then
+                    killer:FindFirstChildOfClass("Highlight"):Destroy()
+                end
+            end
+        end
+    end,
+})
+
+local ToggleToolsESP = VisualTab:Toggle({
+    Title = "ESP Tools",
+    Desc = "Enable/Disable ESP for all tools",
+    Value = false,
+    Callback = function(state)
+        for _, tool in ipairs(workspace.Map.Ingame:GetDescendants()) do
+            if tool:IsA("Tool") and not tool:IsDescendantOf(workspace.Map.Ingame.Map) then
+                if state then
+                    createESP(tool, Color3.fromRGB(0, 0, 255))
+                else
+                    removeESP(tool)
+                end
+            end
+        end
+    end,
+})
+
+local survivorutil = {
+    "007n7",
+    "BuildermanSentry",
+    "BuildermanDispenser",
+    "Pizza",
+    "BuildermanSentryEffectRange"
+}
+
+local ToggleSurvivorUtilESP = VisualTab:Toggle({
+    Title = "ESP SurvivorUtil",
+    Desc = "Enable and disable ESP for SurvivorUtil",
+    Value = false,
+    Callback = function(state)
+        for _, obj in ipairs(workspace:GetDescendants()) do
+            if table.find(survivorutil, obj.Name) and obj:IsA("Model") and obj:FindFirstChild("HumanoidRootPart") then
+                if state then
+                    createESP(obj, Color3.fromRGB(0, 255, 0))
+                else
+                    removeESP(obj)
+                end
+            end
+        end
+    end,
+})
+
+local Toggle = AimbotTab:Toggle({
+    Title = "Aimbot Chance",
+    Desc = "Enable/Disable Aimbot for Chance",
+    Value = false,
+    Callback = function(state)
+        chanceaimbot(state)
+    end,
+})
+
+local function chanceaimbot(state)
+    chanceaim = state
+    
+    local player = game.Players.LocalPlayer
+    local character = player.Character
+    if not character or not character:FindFirstChild("HumanoidRootPart") then return end
+
+    if character.Name ~= "Chance" and state then
+        WindUI:Notification{
+            Title = "Wrong Character",
+            Content = "your current character isn't Chance",
+            Duration = 5
+        }
+        return
+    end
+
+    if state then
+        chanceaimbotLoop = character.HumanoidRootPart.ChildAdded:Connect(function(child)
+            if not chanceaim then return end
+            
+            if table.find(chanceaimbotsounds, child.Name) then
+                local killersFolder = game.Workspace.Players:FindFirstChild("Killers")
+                if killersFolder then
+                    for _, killer in pairs(killersFolder:GetChildren()) do
+                        if killer:IsA("Model") and killer:FindFirstChild("HumanoidRootPart") then
+                            local killerHRP = killer.HumanoidRootPart
+                            local playerHRP = character.HumanoidRootPart
+
+                            for _ = 1, 100 do
+                                task.wait(0.01)
+                                workspace.CurrentCamera.CFrame = CFrame.new(workspace.CurrentCamera.CFrame.Position, killerHRP.Position)
+                                playerHRP.CFrame = CFrame.lookAt(playerHRP.Position, killerHRP.Position)
+                            end
+                        end
+                    end
+                end
+            end
+        end)
+    else
+        if chanceaimbotLoop then
+            chanceaimbotLoop:Disconnect()
+            chanceaimbotLoop = nil
+        end
+    end
+end
+local Toggle = AimbotTab:Toggle({
+    Title = "Aimbot Dusekkar",
+    Desc = "Enable/Disable Aimbot for Dusekkar",
+    Value = false,
+    Callback = function(state)
+        dusekkaraimbot(state)
+    end,
+})
+
+local function dusekkaraimbot(state)
+    dusekkaraim = state
+    local player = game.Players.LocalPlayer
+    local character = player.Character
+    if not character or not character:FindFirstChild("HumanoidRootPart") then return end
+
+    if character.Name ~= "Dusekkar" and state then
+        WindUI:Notification{
+            Title = "Wrong Character",
+            Content = "your current character isn't Dusekkar",
+            Duration = 5
+        }
+        return
+    end
+
+    local remoteEvent = game:GetService("ReplicatedStorage").Modules.Network.RemoteEvent
+    local executedRemote = false
+
+    remoteEvent.OnClientEvent:Connect(function(eventName, args)
+        if eventName == "UseActorAbility" and args[2] == "PlasmaBeam" then
+            executedRemote = true
+        end
+    end)
+
+    if state then
+        dusekkaraimbotLoop = character.HumanoidRootPart.ChildAdded:Connect(function(child)
+            if not dusekkaraim then return end
+            
+            if table.find(dusekkaraimbotsounds, child.Name) then
+                local killersFolder = game.Workspace.Players:FindFirstChild("Killers")
+                if killersFolder then
+                    for _, killer in pairs(killersFolder:GetChildren()) do
+                        if killer:IsA("Model") and killer:FindFirstChild("HumanoidRootPart") then
+                            local killerHRP = killer.HumanoidRootPart
+                            local playerHRP = character.HumanoidRootPart
+
+                            for _ = 1, 100 do
+                                task.wait(0.01)
+                                workspace.CurrentCamera.CFrame = CFrame.new(workspace.CurrentCamera.CFrame.Position, killerHRP.Position)
+                                playerHRP.CFrame = CFrame.lookAt(playerHRP.Position, killerHRP.Position)
+                            end
+
+                            if executedRemote then
+                                local args = {
+                                    [1] = "UseActorAbility",
+                                    [2] = "PlasmaBeam"
+                                }
+                                game:GetService("ReplicatedStorage").Modules.Network.RemoteEvent:FireServer(unpack(args))
+                                dusekkaraimbot(false)
+                            end
+                        end
+                    end
+                end
+            end
+        end)
+    else
+        if dusekkaraimbotLoop then
+            dusekkaraimbotLoop:Disconnect()
+            dusekkaraimbotLoop = nil
+        end
+    end
+end
+local Toggle = AimbotTab:Toggle({
+    Title = "Aimbot Shed",
+    Desc = "Enable/Disable Aimbot",
+    Value = false,
+    Callback = function(state)
+        print(state)
+        shedaimbot(state)
+    end,
+})
+
+local function shedaimbot(state)
+    shedaim = state
+    if game.Players.LocalPlayer.Character.Name ~= "Shedletsky" and state then
+        WindUi:Notify{Title = "Wrong Character", Content = "your current character isn't Shedletsky", Duration = 5}
+        return
+    end
+
+    if state then
+        shedloop = game.Players.LocalPlayer.Character.Sword.ChildAdded:Connect(function(child)
+            if not shedaim then return end
+            for _, v in pairs(shedaimbotsounds) do
+                if child.Name == v then
+                    local killersFolder = game.Workspace.Players:FindFirstChild("Killers")
+                    if killersFolder then
+                        local killer = killersFolder:FindFirstChildOfClass("Model")
+                        if killer and killer:FindFirstChild("HumanoidRootPart") then
+                            local killerHRP = killer.HumanoidRootPart
+                            local playerHRP = game.Players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+                            if playerHRP then
+                                local num = 1
+                                local maxIterations = 100
+
+                                while num <= maxIterations do
+                                    task.wait(0.01)
+                                    num = num + 1
+                                    workspace.CurrentCamera.CFrame = CFrame.new(workspace.CurrentCamera.CFrame.Position, killerHRP.Position)
+                                    playerHRP.CFrame = CFrame.lookAt(playerHRP.Position, killerHRP.Position)
+                                end
+                            end
+                        end
+                    end
+                end
+            end
+        end)
+    else
+        if shedloop then
+            shedloop:Disconnect()
+            shedloop = nil
+        end
+    end
+end
+local Toggle = AimbotTab:Toggle({
+    Title = "Guest1337 AimBot",
+    Desc = "Enable/Disable For Aimbot Guest.",
+    Value = false,
+    Callback = function(state)
+        print(state)
+        guestaimbot(state)
+    end,
+})
+
+local function guestaimbot(state)
+    shedaim = state
+    if game.Players.LocalPlayer.Character.Name ~= "Guest1337" and state then
+        WindUi:Notify{Title = "Wrong Character", Content = "Oops, your current character isn't Guest, this POSSIBLY can bug out, so untoggle unless you're on Guest!", Duration = 5}
+        return
+    end
+    if state then
+        guestloop = game.Players.LocalPlayer.Character.HumanoidRootPart.ChildAdded:Connect(function(child)
+            if not shedaim then return end
+            for _, v in pairs(guestsounds) do
+                if child.Name == v then
+                    local killersFolder = game.Workspace.Players:FindFirstChild("Killers")
+                    if killersFolder then
+                        local killer = killersFolder:FindFirstChildOfClass("Model")
+                        if killer and killer:FindFirstChild("HumanoidRootPart") then
+                            local killerHRP = killer.HumanoidRootPart
+                            local playerHRP = game.Players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+                            if playerHRP then
+                                local num = 1
+                                local maxIterations = 100
+
+                                while num <= maxIterations do
+                                    task.wait(0.01)
+                                    num = num + 1
+                                    workspace.CurrentCamera.CFrame = CFrame.new(workspace.CurrentCamera.CFrame.Position, killerHRP.Position)
+                                    playerHRP.CFrame = CFrame.lookAt(playerHRP.Position, killerHRP.Position)
+                                end
+                            end
+                        end
+                    end
+                end
+            end
+        end)
+    else
+        if guestloop then
+            guestloop:Disconnect()
+            guestloop = nil
+        end
+    end
+end
+local Toggle = AimbotTab:Toggle({
+    Title = "1x1x1x1 Aimbot",
+    Desc = "Enable/Disable Aimbot 1x1x1x1.",
+    Value = false,
+    Callback = function(state)
+        print(state)
+        aimbot1x1x1(state)
+    end,
+})
+
+local function aimbot1x1x1(state)
+    aimbot1x1 = state
+
+    if game.Players.LocalPlayer.Character.Name ~= "1x1x1x1" and state then
+        WindUi:Notify{Title = "Wrong Character", Content = "Oops, your current character isn't 1x1x1x1, this POSSIBLY can bug out, so untoggle unless you're on 1x1x1x1!", Duration = 5}
+        return 
+    end
+
+    if state then
+        aimbot1x1loop = game.Players.LocalPlayer.Character.HumanoidRootPart.ChildAdded:Connect(function(child)
+            if not aimbot1x1 then return end
+            for _, v in pairs(aimbot1x1sounds) do
+                if child.Name == v then
+                    local survivors = {}
+                    for _, player in pairs(game.Players:GetPlayers()) do
+                        if player ~= game.Players.LocalPlayer then
+                            local character = player.Character
+                            if character and character:FindFirstChild("HumanoidRootPart") then
+                                table.insert(survivors, character)
+                            end
+                        end
+                    end
+
+                    local nearestSurvivor = nil
+                    local shortestDistance = math.huge  
+
+                    for _, survivor in pairs(survivors) do
+                        local survivorHRP = survivor.HumanoidRootPart
+                        local playerHRP = game.Players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+
+                        if playerHRP then
+                            local distance = (survivorHRP.Position - playerHRP.Position).Magnitude
+                            if distance < shortestDistance then
+                                shortestDistance = distance
+                                nearestSurvivor = survivor
+                            end
+                        end
+                    end
+
+                    if nearestSurvivor then
+                        local nearestHRP = nearestSurvivor.HumanoidRootPart
+                        local playerHRP = game.Players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+
+                        if playerHRP then
+                            local direction = (nearestHRP.Position - playerHRP.Position).Unit
+                            local num = 1
+                            local maxIterations = 100 
+
+                            if child.Name == "rbxassetid://79782181585087" then
+                                maxIterations = 220  
+                            end
+
+                            while num <= maxIterations do
+                                task.wait(0.01)
+                                num = num + 1
+                                workspace.CurrentCamera.CFrame = CFrame.new(workspace.CurrentCamera.CFrame.Position, nearestHRP.Position)
+                                playerHRP.CFrame = CFrame.lookAt(playerHRP.Position, Vector3.new(nearestHRP.Position.X, nearestHRP.Position.Y, nearestHRP.Position.Z))
+                            end
+                        end
+                    end
+                end
+            end
+        end)
+    else
+        if aimbot1x1loop then
+            aimbot1x1loop:Disconnect()
+            aimbot1x1loop = nil
+        end
+    end
+end
+local Toggle = AimbotTab:Toggle({
+    Title = "AutoBlock",
+    Desc = "AutoBlock 70% Accurate",
+    Value = false,
+    Callback = function(state)
+        BlockEnabled = state
+        local Notification = WindUI:Notify({
+            Title = "Notification",
+            Content = "Block state set to: " .. tostring(BlockEnabled),
+            Duration = 5,
+        })
+    end,
+})
+local Slider = AimbotTab:Slider({
+    Title = "AutoBlock Distance",
+    Step = 1,
+    Value = {
+        Min = 1,
+        Max = 20,
+        Default = 1,
+    },
+    Callback = function(value)
+AutoBlockDistance = value
+        local Notification = WindUI:Notify({
+            Title = "Notification",
+            Content = "Auto Block Distance set to: " .. AutoBlockDistance .. " Studs",
+            Duration = 5,
+        })
+    end
+})
